@@ -16,13 +16,14 @@ API_KEY = read_api_key("omdb_key.txt")
 
 from imdb import IMDb
 
-def get_movie_titles_from_books():
+def get_movie_titles_from_books(num_pages):
     ia = IMDb()
-    search_results = ia.get_keyword('based-on-novel')
     movie_titles = []
-    for movie in search_results:
-        title = re.search(r'^([^()]+)', str(movie)).group(1)
-        movie_titles.append(title.strip())
+    for page_number in range(num_pages):
+        search_results = ia.get_keyword('based-on-novel', page=page_number+1)
+        for movie in search_results:
+            title = re.search(r'^([^()]+)', str(movie)).group(1)
+            movie_titles.append(title.strip())
     return movie_titles
 
 def convert_to_decimal(value):
@@ -65,20 +66,22 @@ def create_database():
     conn = sqlite3.connect('movie_ratings.db')
     cur = conn.cursor()
     cur.execute('''CREATE TABLE IF NOT EXISTS 'Movie Ratings'
-                 (title TEXT PRIMARY KEY, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
+                 (title_id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
     conn.commit()
     conn.close()
 
 def insert_ratings(title, ratings):
+    if ratings is None:
+        print(f"No ratings found for '{title}'. Skipping insertion.")
+        return
     conn = sqlite3.connect('movie_ratings.db')
     cur = conn.cursor()
-    cur.execute('''INSERT OR REPLACE INTO 'Movie Ratings' (title, imdb, rotten_tomatoes, metacritic)
-                 VALUES (?, ?, ?, ?)''', (title, ratings.get('Internet Movie Database', None), ratings.get('Rotten Tomatoes', None), ratings.get('Metacritic', None)))
+    cur.execute('''INSERT OR REPLACE INTO 'Movie Ratings' (title, imdb, rotten_tomatoes, metacritic) VALUES (?, ?, ?, ?)''', (title, ratings.get('Internet Movie Database', None), ratings.get('Rotten Tomatoes', None), ratings.get('Metacritic', None)))
     conn.commit()
     conn.close()
 
 #Running
-movie_adaptations = get_movie_titles_from_books()
+movie_adaptations = get_movie_titles_from_books(3)
 
 if not os.path.exists('movie_ratings.db'):
     create_database()
@@ -86,7 +89,7 @@ if not os.path.exists('movie_ratings.db'):
 conn = sqlite3.connect('movie_ratings.db')
 cur = conn.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS 'Movie Ratings'
-             (title TEXT PRIMARY KEY, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
+             (title_id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
 
 
 cur.execute('''SELECT title FROM 'Movie Ratings' ''')
@@ -103,6 +106,6 @@ for title in new_movies[:26]:  # Limit to the first 25 new movies
 #optional printing statement
 # cur.execute('''SELECT * FROM 'Movie Ratings' ''')
 # for row in cur.fetchall():
-#     print(f"Ratings for '{row[0]}': IMDb: {row[1]}, Rotten Tomatoes: {row[2]}, Metacritic: {row[3]}")
+#     print(f"Ratings for '{row[1]}': IMDb: {row[2]}, Rotten Tomatoes: {row[3]}, Metacritic: {row[3]}")
 
 conn.close()
