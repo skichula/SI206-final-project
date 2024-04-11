@@ -63,7 +63,7 @@ def get_movie_ratings(title):
         return "Error: Unable to access API", None
 
 def create_database():
-    conn = sqlite3.connect('movie_ratings.db')
+    conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
     cur.execute('''CREATE TABLE IF NOT EXISTS 'Movie Ratings'
                  (title_id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
@@ -74,7 +74,7 @@ def insert_ratings(title, ratings):
     if ratings is None:
         print(f"No ratings found for '{title}'. Skipping insertion.")
         return
-    conn = sqlite3.connect('movie_ratings.db')
+    conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
     cur.execute('''INSERT OR REPLACE INTO 'Movie Ratings' (title, imdb, rotten_tomatoes, metacritic) VALUES (?, ?, ?, ?)''', (title, ratings.get('Internet Movie Database', None), ratings.get('Rotten Tomatoes', None), ratings.get('Metacritic', None)))
     conn.commit()
@@ -83,10 +83,10 @@ def insert_ratings(title, ratings):
 #Running
 movie_adaptations = get_movie_titles_from_books(3)
 
-if not os.path.exists('movie_ratings.db'):
+if not os.path.exists('ratings.db'):
     create_database()
 
-conn = sqlite3.connect('movie_ratings.db')
+conn = sqlite3.connect('ratings.db')
 cur = conn.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS 'Movie Ratings'
              (title_id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, imdb REAL, rotten_tomatoes REAL, metacritic REAL)''')
