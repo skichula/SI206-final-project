@@ -44,4 +44,3 @@ def get_book_ratings(title):
         if not found:
             rating = -1
 
-get_book_ratings("The Maze Runner")
