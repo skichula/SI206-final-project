@@ -40,7 +40,6 @@ def get_book_ratings(book_list):
                 title = book_info.get('title', 0)
                 rating = book_info.get('ratings_average', 0)
                 rating_list.append([title, rating])
-    # print(rating_list)
     return rating_list
 
 
@@ -54,35 +53,35 @@ def create_database():
     conn.close()
 
 def insert_ratings(rating_list):
-    # for tup in rating_list:
-    #     if tup[1] == 0:
-    #         print(f"No ratings found for '{tup[0]}'. Skipping insertion.")
-    #         return
-    # conn = sqlite3.connect('ratings.db')
-    # cur = conn.cursor()
-    # cur.execute('''INSERT OR REPLACE INTO 'Open Library Ratings' (rating) VALUES= (?)''', (rating_list))
-    # conn.commit()
-    # conn.close()
     conn =sqlite3.connect('ratings.db')
     cur = conn.cursor()
-    for rating in rating_list:
-        cur.execute('''INSERT OR REPLACE INTO "Open Library Ratings" (rating) VALUES (?)''', (rating[1],))
-    print('done running')
+    # print(rating_list)
+    for tup in rating_list:
+        title = tup[0]
+        rating = tup[1]
+        # print(f'ratings for {tup[0]}: {tup[1]}')
+        cur.execute('''SELECT title_id FROM "Movie Ratings" WHERE title = ?''', (title,))
+        result = cur.fetchone()
+        if result: 
+            title_id = result[0]
+            cur.execute('''INSERT OR REPLACE INTO 'Open Library Ratings' (title_id, rating) VALUES (?, ?)''', (title_id, rating))
+        else:
+            print(f"No matching title found for {title}")
     conn.commit()
     conn.close()
 
-movie_adaptations = get_movie_titles_from_books(3)
+create_database()
+conn = sqlite3.connect('ratings.db')
+cur = conn.cursor()
+
+movie_adaptations = get_movie_titles_from_books(1)
 # print(movie_adaptations)
 book_titles = get_title(movie_adaptations)
 # print(book_titles)
 ratings = get_book_ratings(book_titles)
 # print(ratings)
-for rating in ratings:
-    insert_ratings(rating)
+insert_ratings(ratings[0:26])
 
-create_database()
-conn = sqlite3.connect('ratings.db')
-cur = conn.cursor()
 
 # cur.execute('''SELECT title FROM 'Movie Ratings' ''')
 # existing_titles = set(row[0] for row in cur.fetchall()) # Retrieve the titles of movies already in the database
