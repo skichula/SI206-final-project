@@ -120,32 +120,33 @@ def get_movies_with_genres():
     conn.close()
     return rows
 
-#Running
-movie_adaptations = get_movie_titles_from_books(3)
+if __name__ == "__main__":
+    #Running
+    movie_adaptations = get_movie_titles_from_books(3)
 
-create_database()
-conn = sqlite3.connect('ratings.db')
-cur = conn.cursor()
+    create_database()
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
 
-cur.execute('''SELECT title FROM 'Movie Ratings' ''')
-existing_titles = set(row[0] for row in cur.fetchall()) # Retrieve the titles of movies already in the database
+    cur.execute('''SELECT title FROM 'Movie Ratings' ''')
+    existing_titles = set(row[0] for row in cur.fetchall()) # Retrieve the titles of movies already in the database
 
-new_movies = []
-for title in movie_adaptations:
-    if title not in existing_titles:
-        new_movies.append(title)
-for title in new_movies[:26]:  # Limit to the first 25 new movies
-    ratings_output = get_movie_ratings(title)
-    insert_ratings(title, ratings_output[1], ratings_output[2])
+    new_movies = []
+    for title in movie_adaptations:
+        if title not in existing_titles:
+            new_movies.append(title)
+    for title in new_movies[:26]:  # Limit to the first 25 new movies
+        ratings_output = get_movie_ratings(title)
+        insert_ratings(title, ratings_output[1], ratings_output[2])
 
 
-movies_with_genres = get_movies_with_genres()
-# for movie in movies_with_genres:
-    #print(movie)
+    movies_with_genres = get_movies_with_genres()
+    # for movie in movies_with_genres:
+        #print(movie)
 
-#optional printing statement
-cur.execute('''SELECT * FROM 'Movie Ratings' ''')
-for row in cur.fetchall():
-    print(f"Ratings for '{row[1]}': IMDb: {row[2]}, Rotten Tomatoes: {row[3]}, Metacritic: {row[4]}, Genre ID: {row[5]}")
+    #optional printing statement
+    cur.execute('''SELECT * FROM 'Movie Ratings' ''')
+    for row in cur.fetchall():
+        print(f"Ratings for '{row[1]}': IMDb: {row[2]}, Rotten Tomatoes: {row[3]}, Metacritic: {row[4]}, Genre ID: {row[5]}")
 
-conn.close()
+    conn.close()
