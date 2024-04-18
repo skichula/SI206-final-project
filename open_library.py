@@ -5,18 +5,8 @@ import os
 import re
 import sqlite3
 
-from imdb import IMDb
+from fuzzywuzzy import fuzz
 
-def get_movie_titles_from_books(num_pages):
-    ia = IMDb()
-    movie_titles = []
-    for page_number in range(num_pages):
-        search_results = ia.get_keyword('based-on-novel', page=page_number+1)
-        for movie in search_results:
-            title = re.search(r'^([^()]+)', str(movie)).group(1)
-            movie_titles.append(title.strip())
-    # print(movie_titles)
-    return movie_titles
 
 def get_title(movie_titles):
     book_list = []
@@ -52,21 +42,55 @@ def create_database():
     conn.commit()
     conn.close()
 
+# def insert_ratings(rating_list):
+#     conn =sqlite3.connect('ratings.db')
+#     cur = conn.cursor()
+#     # print(rating_list)
+#     for tup in rating_list:
+#         title = tup[0]
+#         rating = tup[1]
+#         # print(f'ratings for {tup[0]}: {tup[1]}')
+#         cur.execute('''SELECT title_id FROM "Movie Ratings" WHERE title = ?''', (title,))
+#         result = cur.fetchone()
+#         print(result)
+#         if result: 
+#             title_id = result[0]
+#             cur.execute('''INSERT OR REPLACE INTO 'Open Library Ratings' (title_id, rating) VALUES (?, ?)''', (title_id, rating))
+#         else:
+#             print(f"No matching title found for {title}")
+#     conn.commit()
+#     conn.close()
+    
+def find_best_match(title, cur):
+    cur.execute('''SELECT title, title_id FROM "Movie Ratings"''')
+    matches = []
+    title_in_table = ""
+    for row in cur.fetchall():
+        title_in_table = row[0]
+        title_id = row[1]
+        similarity_ratio = fuzz.partial_ratio(title, title_in_table)
+        # print(f'sarah title is {title_in_table}')
+        matches.append((title_in_table, title_id, similarity_ratio))
+    return max(matches, key=lambda x: x[2])[1] if matches else None
+
 def insert_ratings(rating_list):
-    conn =sqlite3.connect('ratings.db')
+    conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
-    # print(rating_list)
+    
     for tup in rating_list:
         title = tup[0]
         rating = tup[1]
-        # print(f'ratings for {tup[0]}: {tup[1]}')
-        cur.execute('''SELECT title_id FROM "Movie Ratings" WHERE title = ?''', (title,))
-        result = cur.fetchone()
-        if result: 
-            title_id = result[0]
-            cur.execute('''INSERT OR REPLACE INTO 'Open Library Ratings' (title_id, rating) VALUES (?, ?)''', (title_id, rating))
+        
+        # Find the best matching title_id using fuzzy matching
+        title_id = find_best_match(title, cur)
+        # print(f'emma title:{title} | sarah title:{title_id}')
+        
+        if title_id:
+            # Insert the rating into "Open Library Ratings" table only if a matching title_id is found
+            cur.execute('''INSERT OR REPLACE INTO "Open Library Ratings" (title_id, rating) VALUES (?, ?)''', (title_id, rating))
         else:
             print(f"No matching title found for {title}")
+
     conn.commit()
     conn.close()
 
@@ -74,22 +98,12 @@ create_database()
 conn = sqlite3.connect('ratings.db')
 cur = conn.cursor()
 
-movie_adaptations = get_movie_titles_from_books(1)
+cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
+movie_adaptations = [row[0] for row in cur.fetchall()]
 # print(movie_adaptations)
 book_titles = get_title(movie_adaptations)
 # print(book_titles)
-ratings = get_book_ratings(book_titles)
+rating_list = get_book_ratings(book_titles)
 # print(ratings)
-insert_ratings(ratings[0:26])
 
-
-# cur.execute('''SELECT title FROM 'Movie Ratings' ''')
-# existing_titles = set(row[0] for row in cur.fetchall()) # Retrieve the titles of movies already in the database
-
-# new_movies = []
-# for title in movie_adaptations:
-#     if title not in existing_titles:
-#         new_movies.append(title)
-# for title in new_movies[:26]:  # Limit to the first 25 new movies
-#     ratings_output = get_movie_ratings(title)
-#     insert_ratings(title, ratings_output[1], ratings_output[2])
+insert_ratings(rating_list[0:26])
