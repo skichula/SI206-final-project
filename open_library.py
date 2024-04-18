@@ -94,16 +94,17 @@ def insert_ratings(rating_list):
     conn.commit()
     conn.close()
 
-create_database()
-conn = sqlite3.connect('ratings.db')
-cur = conn.cursor()
+if __name__ == "__main__":
+    create_database()
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
 
-cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
-movie_adaptations = [row[0] for row in cur.fetchall()]
-# print(movie_adaptations)
-book_titles = get_title(movie_adaptations)
-# print(book_titles)
-rating_list = get_book_ratings(book_titles)
-# print(ratings)
+    cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
+    movie_adaptations = [row[0] for row in cur.fetchall()]
+    # print(movie_adaptations)
+    book_titles = get_title(movie_adaptations)
+    # print(book_titles)
+    rating_list = get_book_ratings(book_titles)
+    # print(ratings)
 
-insert_ratings(rating_list[0:26])
+    insert_ratings(rating_list[0:26])

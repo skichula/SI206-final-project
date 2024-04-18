@@ -4,6 +4,7 @@ import unittest
 import os
 import re
 import sqlite3
+from fuzzywuzzy import fuzz
 
 def read_api_key(file):
     with open(file, "r") as key_file:
@@ -45,6 +46,34 @@ def get_book_ratings(title):
                 if "averageRating" in item['volumeInfo']:
                     rating = item['volumeInfo']['averageRating']
     return rating
+
+def find_closest_title(title):
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
+    cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+    titles = [row[0] for row in cur.fetchall()]
+    ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
+    closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
+    for closest_title in closest_titles:
+        cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
+        row = cur.fetchone()
+        if row:
+            conn.close()
+            return closest_title
+    conn.close()
+    return None
+
+def get_rating_for_closest_title(title):
+    query_title = '"' + title.replace(" ", "+") + '"'
+    url = f"https://www.googleapis.com/books/v1/volumes?q=title:{query_title}&key={API_KEY}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        for item in data['items']:
+            if item['volumeInfo']['title'] == title:
+                if "averageRating" in item['volumeInfo']:
+                    return item['volumeInfo']['averageRating']
+    return None
 
 def main():
     create_googlebooks_ratings_table()
