@@ -4,7 +4,6 @@ import unittest
 import os
 import re
 import sqlite3
-from omdb import get_movie_titles_from_books
 
 def read_api_key(file):
     with open(file, "r") as key_file:
@@ -12,21 +11,6 @@ def read_api_key(file):
     return key
 
 API_KEY = read_api_key("googbooks_key.txt")
-
-def convert_to_decimal(value):
-    try:
-        # Match floating-point numbers or integers
-        match = re.search(r'(\d+(\.\d+)?)', value)
-        if match:
-            if float(match.group()) < 10:
-                return round(float(match.group())/10, 2)
-            if float(match.group()) > 10:
-                return round(float(match.group())/100, 2)
-        else:
-            return None
-    except Exception as e:
-        print(f"Error converting to decimal: {e}")
-        return None
     
 def create_googlebooks_ratings_table():
     conn = sqlite3.connect('ratings.db')
@@ -66,19 +50,16 @@ def main():
     create_googlebooks_ratings_table()
     conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
-    movie_adaptations = get_movie_titles_from_books(3)
-    for title in movie_adaptations:
+    cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+    title_list = [row[0] for row in cur.fetchall()]
+    for title in title_list:
         # Retrieve title_id for the movie from Movie Ratings table
         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (title,))
         row = cur.fetchone()
         if row:
             title_id = row[0]
             rating = get_book_ratings(title)
-            if rating is not None:
-                # Insert Google Books rating along with the title_id
-                insert_googlebooks_rating(title_id, rating)
-        else:
-            print(f"No title_id found for '{title}'. Skipping insertion.")
+            insert_googlebooks_rating(title_id, rating)
     conn.commit()
     conn.close()
 
