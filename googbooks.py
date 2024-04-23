@@ -90,8 +90,8 @@ def main():
     WHERE GB.title_id IS NULL
     ''')
     title_list = [row[0] for row in cur.fetchall()]
-    last_25_titles = title_list[-25:]
-    for title in last_25_titles:
+    # last_25_titles = title_list[-25:]
+    for title in title_list:
         # Retrieve title_id for the movie from Movie Ratings table
         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (title,))
         row = cur.fetchone()
