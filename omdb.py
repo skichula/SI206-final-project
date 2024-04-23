@@ -1,7 +1,5 @@
 import requests
 import json
-import unittest
-import os
 import re
 import sqlite3
 
@@ -74,20 +72,6 @@ def create_database():
     conn.commit()
     conn.close()
 
-# def insert_ratings(title, ratings, genres):
-    
-#     conn = sqlite3.connect('ratings.db')
-#     cur = conn.cursor()
-#     if genres is not None:
-#         for genre in genres.split(', '):
-#             #print(genre)
-#             cur.execute('''INSERT OR IGNORE INTO 'Genres' (genre) VALUES (?)''', (genre,))
-#     if ratings is None:
-#         print(f"No ratings found for '{title}'. Skipping insertion.")
-#         return
-#     cur.execute('''INSERT OR REPLACE INTO 'Movie Ratings' (title, imdb, rotten_tomatoes, metacritic) VALUES (?, ?, ?, ?)''', (title, ratings.get('Internet Movie Database', None), ratings.get('Rotten Tomatoes', None), ratings.get('Metacritic', None)))
-#     conn.commit()
-#     conn.close()
 def insert_ratings(title, ratings, genres):
     conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
