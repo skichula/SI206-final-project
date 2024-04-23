@@ -135,7 +135,7 @@ if __name__ == "__main__":
     for title in movie_adaptations:
         if title not in existing_titles:
             new_movies.append(title)
-    for title in new_movies[:26]:  # Limit to the first 25 new movies
+    for title in new_movies[:25]:  # Limit to the first 25 new movies
         ratings_output = get_movie_ratings(title)
         insert_ratings(title, ratings_output[1], ratings_output[2])
 
