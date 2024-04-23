@@ -30,9 +30,9 @@ def convert_to_decimal(value):
         match = re.search(r'(\d+(\.\d+)?)', value)
         if match:
             if float(match.group()) < 10:
-                return round(float(match.group())/10, 2)
+                return round(float(match.group())/2, 2)
             if float(match.group()) > 10:
-                return round(float(match.group())/100, 2)
+                return round(float(match.group())/20, 2)
         else:
             return None
     except Exception as e:
