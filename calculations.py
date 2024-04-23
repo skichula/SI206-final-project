@@ -1,5 +1,6 @@
 import sqlite3
 import matplotlib.pyplot as plt
+import numpy as np
 
 def get_genres():
     conn = sqlite3.connect('ratings.db')
@@ -112,4 +113,50 @@ def plot_movie_ratings_by_genre():
     plt.tight_layout()
     plt.show()
 
-plot_movie_ratings_by_genre()
+
+def calculate_average_book_rating():
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
+
+    # Joining the Open Library Ratings table and the Google Books Ratings table on title_id
+    cur.execute('''
+        SELECT MR.title, 
+                MR.imdb as movie_rating,
+               (OL.rating + GB.googlebooks_rating) / 2 AS average_rating
+        FROM "Movie Ratings" as MR
+        LEFT JOIN "Open Library Ratings" AS OL ON MR.title_id = OL.title_id
+        LEFT JOIN "GoogleBooks Ratings" AS GB ON MR.title_id = GB.title_id
+        WHERE MR.imdb IS NOT NULL AND OL.rating IS NOT NULL AND GB.googlebooks_rating IS NOT NULL
+    ''')
+
+    average_ratings = cur.fetchall()
+    print(average_ratings)
+
+    conn.close()
+    return average_ratings
+
+# calculate_average_book_rating()
+
+def plot_compare_ratings():
+    average_book_ratings = calculate_average_book_rating()
+
+    # Extracting titles, movie ratings, and average book ratings from the fetched data
+    book_titles, movie_ratings, average_book_ratings = zip(*average_book_ratings)
+
+    # Creating a bar graph with two bars for each title
+    bar_width = 0.35
+    index = range(len(book_titles))
+
+    fig, ax = plt.subplots()
+    bar1 = ax.bar(index, movie_ratings, bar_width, label='Movie')
+    bar2 = ax.bar([i + bar_width for i in index], average_book_ratings, bar_width, label="Book")
+
+    ax.set_xlabel("Titles")
+    ax.set_ylabel("Average Ratings")
+    ax.set_title("Comparasin of Average Ratings Between Books and Movies")
+    ax.set_xticks([i + bar_width for i in index])
+    ax.set_xticklabels(book_titles, rotation=45)
+    ax.legend()
+
+plot_compare_ratings()
+# plot_movie_ratings_by_genre()
