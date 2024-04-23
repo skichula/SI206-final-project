@@ -55,41 +55,6 @@ def get_book_ratings(title):
         return rating
     return None
 
-# def find_closest_title(title):
-#     conn = sqlite3.connect('ratings.db')
-#     cur = conn.cursor()
-#     cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
-#     titles = [row[0] for row in cur.fetchall()]
-#     ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
-#     closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
-#     for closest_title in closest_titles:
-#         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
-#         row = cur.fetchone()
-#         if row:
-#             conn.close()
-#             return closest_title
-#     conn.close()
-#     return None
-
-# def find_closest_title_with_rating(title):
-#     conn = sqlite3.connect('ratings.db')
-#     cur = conn.cursor()
-#     cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
-#     titles = [row[0] for row in cur.fetchall()]
-#     ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
-#     closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
-#     for closest_title in closest_titles:
-#         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
-#         row = cur.fetchone()
-#         if row:
-#             title_id = row[0]
-#             rating = get_book_ratings(closest_title)
-#             if rating is not None:
-#                 conn.close()
-#                 return closest_title
-#     conn.close()
-#     return None
-
 def main():
     create_googlebooks_ratings_table()
     conn = sqlite3.connect('ratings.db')
