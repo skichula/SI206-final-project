@@ -159,5 +159,8 @@ def plot_compare_ratings():
     ax.set_xticklabels(book_titles, rotation=45)
     ax.legend()
 
+    plt.tight_layout()
+    plt.show()
+
 plot_compare_ratings()
 # plot_movie_ratings_by_genre()
