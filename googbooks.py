@@ -36,47 +36,59 @@ def get_book_ratings(title):
     response = requests.get(url)
     if response.status_code == 200:
         data = json.loads(response.text)
-        found = False
+        max_ratio = 0
         rating = None
+        most_alike_title = ""
         if 'items' in data:
             for item in data['items']:
-                if found:
-                    break
-                if 'volumeInfo' in item:
-                    if item['volumeInfo']['title'] == title:
-                        found = True
-                        if "averageRating" in item['volumeInfo']:
-                            rating = item['volumeInfo']['averageRating']
-    return rating
-
-def find_closest_title(title):
-    conn = sqlite3.connect('ratings.db')
-    cur = conn.cursor()
-    cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
-    titles = [row[0] for row in cur.fetchall()]
-    ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
-    closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
-    for closest_title in closest_titles:
-        cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
-        row = cur.fetchone()
-        if row:
-            conn.close()
-            return closest_title
-    conn.close()
+                if 'volumeInfo' in item and 'averageRating' in item['volumeInfo']:
+                    current_title = item['volumeInfo']['title'].replace(" ", "+")
+                    check_title = title.replace(" ", "+")
+                    current_ratio = fuzz.ratio(check_title.lower(), current_title.lower())
+                    if current_ratio > max_ratio:
+                        most_alike_title = current_title
+                        max_ratio = current_ratio
+                        rating = item['volumeInfo']['averageRating']
+                        if current_ratio == 100:
+                            break
+        # print(f"Title: {title}  |  Closest Title: {most_alike_title.replace('+', ' ')}  |  Max Ratio: {max_ratio}\n")
+        return rating
     return None
 
-def get_rating_for_closest_title(title):
-    query_title = '"' + title.replace(" ", "+") + '"'
-    url = f"https://www.googleapis.com/books/v1/volumes?q=title:{query_title}&key={API_KEY}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = json.loads(response.text)
-        if 'items' in data:
-            for item in data['items']:
-                if item['volumeInfo']['title'] == title:
-                    if "averageRating" in item['volumeInfo']:
-                        return item['volumeInfo']['averageRating']
-    return None
+# def find_closest_title(title):
+#     conn = sqlite3.connect('ratings.db')
+#     cur = conn.cursor()
+#     cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+#     titles = [row[0] for row in cur.fetchall()]
+#     ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
+#     closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
+#     for closest_title in closest_titles:
+#         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
+#         row = cur.fetchone()
+#         if row:
+#             conn.close()
+#             return closest_title
+#     conn.close()
+#     return None
+
+# def find_closest_title_with_rating(title):
+#     conn = sqlite3.connect('ratings.db')
+#     cur = conn.cursor()
+#     cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+#     titles = [row[0] for row in cur.fetchall()]
+#     ratio_title_pairs = [(fuzz.partial_ratio(title, title_in_db), title_in_db) for title_in_db in titles]
+#     closest_titles = [pair[1] for pair in sorted(ratio_title_pairs, reverse=True)]
+#     for closest_title in closest_titles:
+#         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (closest_title,))
+#         row = cur.fetchone()
+#         if row:
+#             title_id = row[0]
+#             rating = get_book_ratings(closest_title)
+#             if rating is not None:
+#                 conn.close()
+#                 return closest_title
+#     conn.close()
+#     return None
 
 def main():
     create_googlebooks_ratings_table()
