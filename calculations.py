@@ -1,6 +1,14 @@
 import sqlite3
 import matplotlib.pyplot as plt
 
+def get_genres():
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
+    cur.execute('''SELECT genre FROM Genres''')
+    genres = [row[0] for row in cur.fetchall()]
+    conn.close()
+    return genres
+
 def calculate_average_ratings(genre):
     conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
@@ -57,7 +65,7 @@ def calculate_average_ratings(genre):
     #print(avg_imdb, avg_rotten_tomatoes, avg_metacritic)
     return avg_imdb, avg_rotten_tomatoes, avg_metacritic
 
-genres = ["Crime", "Adventure", "Action", "Comedy", "Biography", "Drama", "Animation", "Fantasy", "Family", "Horror"]
+genres = get_genres()
 for genre in genres:
     imdb_ratings, rotten_tomatoes_ratings, metacritic_ratings = calculate_average_ratings(genre)
     # print(f"The average ratings for {genre} movies are:")
