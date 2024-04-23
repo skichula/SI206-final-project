@@ -28,11 +28,9 @@ def get_book_ratings(book_list):
                 book_info = book_data['docs'][0]
                 # print(book_info)
                 title = book_info.get('title', 0)
-                rating = book_info.get('ratings_average', 0)
-                rating_list.append([title, rating])
+                rating = book_info.get('ratings_average', "Null")
+                rating_list.append((title, rating))
     return rating_list
-
-
 
 def create_database():
     conn = sqlite3.connect('ratings.db')
@@ -41,30 +39,10 @@ def create_database():
                  (title_id INTEGER PRIMARY KEY AUTOINCREMENT, rating REAL)''')
     conn.commit()
     conn.close()
-
-# def insert_ratings(rating_list):
-#     conn =sqlite3.connect('ratings.db')
-#     cur = conn.cursor()
-#     # print(rating_list)
-#     for tup in rating_list:
-#         title = tup[0]
-#         rating = tup[1]
-#         # print(f'ratings for {tup[0]}: {tup[1]}')
-#         cur.execute('''SELECT title_id FROM "Movie Ratings" WHERE title = ?''', (title,))
-#         result = cur.fetchone()
-#         print(result)
-#         if result: 
-#             title_id = result[0]
-#             cur.execute('''INSERT OR REPLACE INTO 'Open Library Ratings' (title_id, rating) VALUES (?, ?)''', (title_id, rating))
-#         else:
-#             print(f"No matching title found for {title}")
-#     conn.commit()
-#     conn.close()
     
 def find_best_match(title, cur):
     cur.execute('''SELECT title, title_id FROM "Movie Ratings"''')
     matches = []
-    title_in_table = ""
     for row in cur.fetchall():
         title_in_table = row[0]
         title_id = row[1]
@@ -99,11 +77,10 @@ conn = sqlite3.connect('ratings.db')
 cur = conn.cursor()
 
 cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
-movie_adaptations = [row[0] for row in cur.fetchall()]
+title_list = [row[0] for row in cur.fetchall()]
 # print(movie_adaptations)
-book_titles = get_title(movie_adaptations)
+book_titles = get_title(title_list)
 # print(book_titles)
 rating_list = get_book_ratings(book_titles)
 # print(ratings)
-
-insert_ratings(rating_list[0:26])
+insert_ratings(rating_list)
