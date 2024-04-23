@@ -154,7 +154,7 @@ def plot_compare_ratings():
 
     ax.set_xlabel("Titles")
     ax.set_ylabel("Average Ratings")
-    ax.set_title("Comparasin of Average Ratings Between Books and Movies")
+    ax.set_title("Comparison of Average Ratings Between Books and Movies")
     ax.set_xticks([i + bar_width for i in index])
     ax.set_xticklabels(book_titles, rotation=45)
     ax.legend()
