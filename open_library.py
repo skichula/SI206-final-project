@@ -59,12 +59,10 @@ def insert_ratings(rating_list):
         title = tup[0]
         rating = tup[1]
         
-        # Find the best matching title_id using fuzzy matching
         title_id = find_best_match(title, cur)
         # print(f'emma title:{title} | sarah title:{title_id}')
         
         if title_id:
-            # Insert the rating into "Open Library Ratings" table only if a matching title_id is found
             cur.execute('''INSERT OR REPLACE INTO "Open Library Ratings" (title_id, rating) VALUES (?, ?)''', (title_id, rating))
         else:
             print(f"No matching title found for {title}")
@@ -72,15 +70,17 @@ def insert_ratings(rating_list):
     conn.commit()
     conn.close()
 
-create_database()
-conn = sqlite3.connect('ratings.db')
-cur = conn.cursor()
+if __name__ == "__main__":
+    create_database()
+    conn = sqlite3.connect('ratings.db')
+    cur = conn.cursor()
 
-cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
-title_list = [row[0] for row in cur.fetchall()]
-# print(movie_adaptations)
-book_titles = get_title(title_list)
-# print(book_titles)
-rating_list = get_book_ratings(book_titles)
-# print(ratings)
-insert_ratings(rating_list)
+    cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
+    movie_adaptations = [row[0] for row in cur.fetchall()]
+    # print(movie_adaptations)
+    book_titles = get_title(movie_adaptations)
+    # print(book_titles)
+    rating_list = get_book_ratings(book_titles)
+    # print(ratings)
+
+    insert_ratings(rating_list)
