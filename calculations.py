@@ -127,6 +127,7 @@ def calculate_average_book_rating():
         LEFT JOIN "Open Library Ratings" AS OL ON MR.title_id = OL.title_id
         LEFT JOIN "GoogleBooks Ratings" AS GB ON MR.title_id = GB.title_id
         WHERE MR.imdb IS NOT NULL AND OL.rating IS NOT NULL AND GB.googlebooks_rating IS NOT NULL
+        LIMIT 10
     ''')
 
     average_ratings = cur.fetchall()
