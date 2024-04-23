@@ -38,13 +38,15 @@ def get_book_ratings(title):
         data = json.loads(response.text)
         found = False
         rating = None
-        for item in data['items']:
-            if found:
-                break
-            if item['volumeInfo']['title'] == title:
-                found = True
-                if "averageRating" in item['volumeInfo']:
-                    rating = item['volumeInfo']['averageRating']
+        if 'items' in data:
+            for item in data['items']:
+                if found:
+                    break
+                if 'volumeInfo' in item:
+                    if item['volumeInfo']['title'] == title:
+                        found = True
+                        if "averageRating" in item['volumeInfo']:
+                            rating = item['volumeInfo']['averageRating']
     return rating
 
 def find_closest_title(title):
@@ -69,19 +71,27 @@ def get_rating_for_closest_title(title):
     response = requests.get(url)
     if response.status_code == 200:
         data = json.loads(response.text)
-        for item in data['items']:
-            if item['volumeInfo']['title'] == title:
-                if "averageRating" in item['volumeInfo']:
-                    return item['volumeInfo']['averageRating']
+        if 'items' in data:
+            for item in data['items']:
+                if item['volumeInfo']['title'] == title:
+                    if "averageRating" in item['volumeInfo']:
+                        return item['volumeInfo']['averageRating']
     return None
 
 def main():
     create_googlebooks_ratings_table()
     conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
-    cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+    # cur.execute('''SELECT title FROM 'Movie Ratings' ORDER BY title_id''')
+    cur.execute('''
+    SELECT MR.title
+    FROM 'Movie Ratings' AS MR
+    LEFT JOIN 'GoogleBooks Ratings' AS GB ON MR.title_id = GB.title_id
+    WHERE GB.title_id IS NULL
+    ''')
     title_list = [row[0] for row in cur.fetchall()]
-    for title in title_list:
+    last_25_titles = title_list[-25:]
+    for title in last_25_titles:
         # Retrieve title_id for the movie from Movie Ratings table
         cur.execute('''SELECT title_id FROM 'Movie Ratings' WHERE title = ?''', (title,))
         row = cur.fetchone()
