@@ -28,7 +28,7 @@ def get_book_ratings(book_list):
                 book_info = book_data['docs'][0]
                 # print(book_info)
                 title = book_info.get('title', 0)
-                rating = book_info.get('ratings_average', "Null")
+                rating = book_info.get('ratings_average', "NULL")
                 rating_list.append((title, rating))
     return rating_list
 
@@ -70,17 +70,26 @@ def insert_ratings(rating_list):
     conn.commit()
     conn.close()
 
-if __name__ == "__main__":
+def main():
     create_database()
     conn = sqlite3.connect('ratings.db')
     cur = conn.cursor()
 
-    cur.execute('''SELECT title from "Movie Ratings" ORDER BY title_id''')
-    movie_adaptations = [row[0] for row in cur.fetchall()]
-    # print(movie_adaptations)
-    book_titles = get_title(movie_adaptations)
-    # print(book_titles)
+    cur.execute('''
+    SELECT MR.title
+    FROM 'Movie Ratings' AS MR
+    LEFT JOIN 'Open Library Ratings' AS OL ON MR.title_id = OL.title_id
+    WHERE OL.title_id IS NULL
+    ''')
+    title_list = [row[0] for row in cur.fetchall()]
+    book_titles = get_title(title_list)
     rating_list = get_book_ratings(book_titles)
-    # print(ratings)
-
+    print(rating_list)
     insert_ratings(rating_list)
+    conn.commit()
+    conn.close()
+
+if __name__ == "__main__":
+    main()
+
+

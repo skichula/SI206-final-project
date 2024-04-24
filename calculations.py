@@ -163,4 +163,4 @@ def plot_compare_ratings():
     plt.show()
 
 plot_compare_ratings()
-# plot_movie_ratings_by_genre()
+plot_movie_ratings_by_genre()
