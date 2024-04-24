@@ -1,0 +1,65 @@
+**Average ratings for Adventure**
+Average IMDb rating: 3.71
+Average Rotten Tomatoes rating: 3.53
+Average Metacritic rating: 3.24
+
+**Average ratings for Crime**
+Average IMDb rating: 4.0
+Average Rotten Tomatoes rating: 4.08
+Average Metacritic rating: 3.7
+
+**Average ratings for Action**
+Average IMDb rating: 3.79
+Average Rotten Tomatoes rating: 3.41
+Average Metacritic rating: 3.2
+
+**Average ratings for Comedy**
+Average IMDb rating: 3.64
+Average Rotten Tomatoes rating: 3.72
+Average Metacritic rating: 3.27
+
+**Average ratings for Biography**
+Average IMDb rating: 3.95
+Average Rotten Tomatoes rating: 4.35
+Average Metacritic rating: 4.43
+
+**Average ratings for Drama**
+Average IMDb rating: 3.77
+Average Rotten Tomatoes rating: 3.46
+Average Metacritic rating: 3.5
+
+**Average ratings for Animation**
+Average IMDb rating: 4.03
+Average Rotten Tomatoes rating: 4.85
+Average Metacritic rating: None
+
+**Average ratings for Fantasy**
+Average IMDb rating: 3.95
+Average Rotten Tomatoes rating: 4.85
+Average Metacritic rating: None
+
+**Average ratings for Horror**
+Average IMDb rating: 3.6
+Average Rotten Tomatoes rating: 3.95
+Average Metacritic rating: 3.17
+
+Average rating for 'Game of Thrones': 4.11468815
+
+Average rating for 'Bridgerton': 3.65
+
+Average rating for 'The Witcher': 4.5
+
+Average rating for 'Sherlock': 3.85416675
+
+Average rating for 'The Godfather': 4.1911765
+
+Average rating for 'Tokyo Vice': 3.6875
+
+Average rating for 'Outlander': 4.33333325
+
+Average rating for 'Miss Peregrine's Home for Peculiar Children': 4.29629635
+
+Average rating for 'Slow Horses': 4.5
+
+Average rating for 'American Fiction': 3.5
+

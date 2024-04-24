@@ -69,6 +69,11 @@ def calculate_average_ratings(genre):
 genres = get_genres()
 for genre in genres:
     imdb_ratings, rotten_tomatoes_ratings, metacritic_ratings = calculate_average_ratings(genre)
+    with open("calculations.txt", 'a') as file:
+        file.write(f"**Average ratings for {genre}**\n")
+        file.write(f"Average IMDb rating: {imdb_ratings}\n")
+        file.write(f"Average Rotten Tomatoes rating: {rotten_tomatoes_ratings}\n")
+        file.write(f"Average Metacritic rating: {metacritic_ratings}\n\n")
     # print(f"The average ratings for {genre} movies are:")
     # print(f"IMDb: {imdb_ratings}")
     # print(f"Rotten Tomatoes: {rotten_tomatoes_ratings}")
@@ -132,7 +137,6 @@ def calculate_average_book_rating():
 
     average_ratings = cur.fetchall()
     # print(average_ratings)
-
     conn.close()
     return average_ratings
 
@@ -143,6 +147,9 @@ def plot_compare_ratings():
 
     # Extracting titles, movie ratings, and average book ratings from the fetched data
     book_titles, movie_ratings, average_book_ratings = zip(*average_book_ratings)
+    with open("calculations.txt", 'a') as file:
+        for i in range(len(book_titles)):
+            file.write(f"Average rating for '{book_titles[i]}': {average_book_ratings[i]}\n\n")
 
     # Creating a bar graph with two bars for each title
     bar_width = 0.35
@@ -175,7 +182,7 @@ def plot_book_ratings():
         LEFT JOIN "Open Library Ratings" AS OL ON MR.title_id = OL.title_id
         LEFT JOIN "GoogleBooks Ratings" AS GB ON MR.title_id = GB.title_id
         WHERE OL.rating IS NOT NULL AND GB.googlebooks_rating IS NOT NULL
-        LIMIT 10
+        LIMIT 20
     ''')
 
     book_ratings = cur.fetchall()
@@ -185,8 +192,8 @@ def plot_book_ratings():
     index = range(len(book_ratings))
 
     fig, ax = plt.subplots()
-    bar1 = ax.bar(index, ol_ratings, bar_width, label='Open Library')
-    bar2 = ax.bar([i + bar_width for i in index], gb_ratings, bar_width, label="Google Books")
+    bar1 = ax.bar(index, ol_ratings, bar_width, label='Open Library', color="red")
+    bar2 = ax.bar([i + bar_width for i in index], gb_ratings, bar_width, label="Google Books", color="purple")
 
     ax.set_xlabel("Titles")
     ax.set_ylabel("Average Ratings")
