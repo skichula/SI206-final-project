@@ -28,7 +28,7 @@ def get_book_ratings(book_list):
                 book_info = book_data['docs'][0]
                 # print(book_info)
                 title = book_info.get('title', 0)
-                rating = book_info.get('ratings_average', "NULL")
+                rating = book_info.get('ratings_average', None)
                 rating_list.append((title, rating))
     return rating_list
 
