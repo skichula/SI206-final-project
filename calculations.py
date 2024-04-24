@@ -131,7 +131,7 @@ def calculate_average_book_rating():
     ''')
 
     average_ratings = cur.fetchall()
-    print(average_ratings)
+    # print(average_ratings)
 
     conn.close()
     return average_ratings
