@@ -175,7 +175,7 @@ def plot_book_ratings():
         LEFT JOIN "Open Library Ratings" AS OL ON MR.title_id = OL.title_id
         LEFT JOIN "GoogleBooks Ratings" AS GB ON MR.title_id = GB.title_id
         WHERE OL.rating IS NOT NULL AND GB.googlebooks_rating IS NOT NULL
-        LIMIT 10
+        LIMIT 20
     ''')
 
     book_ratings = cur.fetchall()
@@ -185,8 +185,8 @@ def plot_book_ratings():
     index = range(len(book_ratings))
 
     fig, ax = plt.subplots()
-    bar1 = ax.bar(index, ol_ratings, bar_width, label='Open Library')
-    bar2 = ax.bar([i + bar_width for i in index], gb_ratings, bar_width, label="Google Books")
+    bar1 = ax.bar(index, ol_ratings, bar_width, label='Open Library', color="red")
+    bar2 = ax.bar([i + bar_width for i in index], gb_ratings, bar_width, label="Google Books", color="purple")
 
     ax.set_xlabel("Titles")
     ax.set_ylabel("Average Ratings")
